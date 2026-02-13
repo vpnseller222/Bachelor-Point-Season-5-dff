@@ -214,34 +214,39 @@
     <script>
         const BOT_NAME = "Bachelor_Point_Season_5_ep_bot"; 
         const LOCK_TIME = 24 * 60 * 60 * 1000;
-        const AD_LIMIT = 4;
         let selectedMethod = "Bkash";
 
-        const db = firebase.initializeApp({ databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com/" }).database();
+        // Firebase Setup - Added .firebaseio.com/ correctly
+        const db = firebase.initializeApp({ 
+            databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com" 
+        }).database();
+
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
-        // ইউজার ডাটা হ্যান্ডলিং
+        // ইউজার ডাটা হ্যান্ডলিং (সঠিকভাবে টেলিগ্রাম থেকে ডাটা নেওয়ার জন্য)
         function initUser() {
-            let userObj = tg.initDataUnsafe?.user || { id: "123456", first_name: "MR User", photo_url: "" };
-            let savedUser = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {
-                bal: 0, t1: false, t2: false, t3: false, t4: false, refs: 0, 
-                id: userObj.id,
-                name: userObj.first_name,
-                photo: userObj.photo_url || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            let tgUser = tg.initDataUnsafe?.user;
+            let defaultPhoto = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+            
+            let localData = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {};
+            
+            let userObj = {
+                id: tgUser?.id || localData.id || "12345678",
+                name: tgUser?.first_name || localData.name || "Unknown User",
+                photo: tgUser?.photo_url || localData.photo || defaultPhoto,
+                bal: localData.bal || 0,
+                refs: localData.refs || 0,
+                t1: localData.t1 || false,
+                t2: localData.t2 || false,
+                t3: localData.t3 || false,
+                t4: localData.t4 || false
             };
-            return savedUser;
+            return userObj;
         }
 
         let user = initUser();
-
-        function setMethod(m) {
-            selectedMethod = m;
-            document.getElementById('btn-bkash').classList.toggle('active', m === 'Bkash');
-            document.getElementById('btn-nagad').classList.toggle('active', m === 'Nagad');
-            document.getElementById('w-num').placeholder = m === 'Bkash' ? "বিকাশ নাম্বার দিন" : "নগদ নাম্বার দিন";
-        }
 
         function syncUI() {
             document.getElementById('u-name-top').innerText = user.name;
@@ -254,30 +259,69 @@
             document.getElementById('head-img').src = user.photo;
             document.getElementById('u-img').src = user.photo;
             document.getElementById('ref-url').innerText = `https://t.me/${BOT_NAME}?start=${user.id}`;
+            
             [1,2,3,4].forEach(n => { 
                 const b = document.getElementById('btn-t'+n);
-                if(user['t'+n]) { b.innerText = "DONE"; b.style.background = "#16a34a"; b.onclick = null; }
+                if(user['t'+n]) { 
+                    b.innerText = "DONE"; 
+                    b.style.background = "#16a34a"; 
+                    b.onclick = null; 
+                }
             });
             localStorage.setItem('mr_v_ultimate_pro', JSON.stringify(user));
             db.ref('users/' + user.id).update(user);
         }
 
-        function joinTask(num, url) {
-            window.open(url, "_blank");
-            const btn = document.getElementById('btn-t'+num);
-            btn.innerText = "REFRESH";
-            btn.style.background = "#f59e0b";
-            btn.onclick = () => claimTask(num);
+        // ভিডিও ডাটা রেন্ডারিং ফিক্স
+        let allVids = {};
+        db.ref('videos').on('value', snap => { 
+            allVids = snap.val() || {}; 
+            renderVids(); 
+        }, (error) => {
+            console.error("Firebase Error: ", error);
+            document.getElementById('v-list').innerHTML = "ডাটা লোড হতে সমস্যা হচ্ছে!";
+        });
+
+        function renderVids(query = "") {
+            const container = document.getElementById('v-list');
+            container.innerHTML = "";
+            let keys = Object.keys(allVids);
+            if(keys.length === 0) { container.innerHTML = "কোন ভিডিও নেই"; return; }
+            
+            keys.sort((a, b) => { 
+                const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0; 
+                const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0; 
+                return nB - nA; 
+            });
+
+            keys.forEach(id => {
+                const v = allVids[id];
+                if (query !== "" && !v.name.toLowerCase().includes(query.toLowerCase())) return;
+                
+                const lock = localStorage.getItem('lock_' + id);
+                const isL = lock && (Date.now() - lock < LOCK_TIME);
+                
+                container.innerHTML += `
+                <div class="v-card">
+                    <div class="v-card-inner">
+                        <div class="v-thumb"><img src="${v.photo}"></div>
+                        <div class="v-info">
+                            <div class="v-title">${v.name}</div>
+                            <button class="v-btn ${isL ? 'locked-btn' : ''}" onclick="startProcess('${id}')">
+                                ${isL ? 'Locked 🚫' : 'ভিডিও নিন'}
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
         }
 
-        function claimTask(num) {
-            const rewards = { 1: 10, 2: 10, 3: 10, 4: 5 };
-            user.bal += rewards[num];
-            user['t'+num] = true;
-            syncUI();
-            toast(`৳${rewards[num]} বোনাস যুক্ত হয়েছে!`);
+        function filterVids() {
+            const q = document.getElementById('episodeSearch').value;
+            renderVids(q);
         }
 
+        // অন্যান্য ফাংশন আগের মতই
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -285,59 +329,28 @@
             el.classList.add('active');
         }
 
+        function setMethod(m) {
+            selectedMethod = m;
+            document.getElementById('btn-bkash').classList.toggle('active', m === 'Bkash');
+            document.getElementById('btn-nagad').classList.toggle('active', m === 'Nagad');
+            document.getElementById('w-num').placeholder = m === 'Bkash' ? "বিকাশ নাম্বার দিন" : "নগদ নাম্বার দিন";
+        }
+
         function toast(msg, type = 'success') {
             const t = document.getElementById('smart-toast');
-            const icon = type === 'success' ? '✅' : '❌';
-            t.innerHTML = `<span>${icon}</span> <span>${msg}</span>`; 
+            t.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span> <span>${msg}</span>`; 
             t.className = type; t.classList.add('active');
-            setTimeout(() => t.classList.remove('active'), 1500); 
+            setTimeout(() => t.classList.remove('active'), 2500); 
         }
 
         function copyLink() {
             const l = document.getElementById('ref-url').innerText;
-            const i = document.createElement('input'); i.value = l; document.body.appendChild(i); i.select();
+            const i = document.createElement('input'); 
+            i.value = l; document.body.appendChild(i); i.select();
             document.execCommand('copy'); document.body.removeChild(i);
             toast("রেফার লিঙ্ক কপি হয়েছে!");
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const refBy = urlParams.get('start');
-        if (refBy && refBy != user.id && !localStorage.getItem('ref_done')) {
-            db.ref('users/' + refBy).once('value', snap => {
-                if(snap.exists()){
-                    let refData = snap.val();
-                    refData.bal += 10;
-                    refData.refs += 1;
-                    db.ref('users/' + refBy).update(refData);
-                    localStorage.setItem('ref_done', 'true');
-                }
-            });
-        }
-
-        let allVids = {};
-        db.ref('videos').on('value', snap => { allVids = snap.val() || {}; renderVids(); });
-
-        function renderVids(query = "") {
-            const container = document.getElementById('v-list');
-            container.innerHTML = "";
-            let keys = Object.keys(allVids);
-            if(keys.length === 0) { container.innerHTML = "কোন ভিডিও নেই"; return; }
-            keys.sort((a, b) => { const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0; const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0; return nB - nA; });
-            keys.forEach(id => {
-                const v = allVids[id];
-                const match = v.name.match(/Episode\s+(\d+)/i);
-                const epNumber = match ? match[1] : "";
-                if (query !== "" && epNumber !== query) return;
-                const lock = localStorage.getItem('lock_' + id);
-                const isL = lock && (Date.now() - lock < LOCK_TIME);
-                container.innerHTML += `<div class="v-card"><div class="v-card-inner">
-                    <div class="v-thumb"><img src="${v.photo}"></div>
-                    <div class="v-info">
-                        <div class="v-title">${v.name}</div>
-                        <button class="v-btn ${isL ? 'locked-btn' : ''}" onclick="startProcess('${id}')">${isL ? 'Locked 🚫' : 'ভিডিও নিন'}</button>
-                    </div></div></div>`;
-            });
-        }
-
-        function startProcess(id) {
-            const lock = localStorag
+        function joinTask(num, url) {
+            window.open(url, "_blank");
+            const btn = document.getElementBy
