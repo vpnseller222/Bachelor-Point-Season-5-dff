@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bachelor Point Season 5 - Professional Pro</title>
+    <title>Bachelor Point Season 5 - Ultra Premium App</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,210 +12,334 @@
     <script src='//libtl.com/sdk.js' data-zone='10525370' data-sdk='show_10525370'></script>
     
     <style>
-        :root { --primary: #e63946; --secondary: #1d3557; --bg: #f0f2f5; --white: #ffffff; }
+        :root { 
+            --dark: #0f172a; 
+            --blue: #2563eb; 
+            --white: #ffffff; 
+            --gray: #f8fafc;
+            --rainbow: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+        }
         
         body { 
-            background: var(--bg); color: #222; font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--dark); color: var(--white); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             margin: 0; padding: 0; user-select: none; -webkit-user-select: none;
             width: 100vw; height: 100vh; overflow-x: hidden;
         }
-        
-        .header-section { 
-            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-            padding: 55px 20px 85px; text-align: center; color: white; 
-            border-radius: 0 0 55px 55px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-        }
-        .header-section h1 { margin: 0; font-size: 26px; text-transform: uppercase; font-weight: 900; }
 
-        .category-bar { 
-            display: flex; justify-content: center; padding: 15px; background: var(--white); 
-            margin: -40px 20px 25px; border-radius: 25px; box-shadow: 0 12px 30px rgba(0,0,0,0.1); 
-            position: sticky; top: 10px; z-index: 1000; overflow-x: auto; gap: 12px; 
+        /* ১. চকচকে লাফালাফি করা রেইনবো এনিমেশন */
+        .jump-text {
+            background: var(--rainbow);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow-run 3s linear infinite, bounce-jump 1.5s ease-in-out infinite;
+            font-weight: 900;
+            display: inline-block;
         }
-        .cat-btn { 
-            padding: 12px 25px; border-radius: 18px; border: 2px solid var(--primary); 
-            background: transparent; color: var(--primary); font-weight: bold; 
-            cursor: pointer; font-size: 14px; white-space: nowrap; transition: 0.3s; 
-        }
-        .cat-btn.active { background: var(--primary); color: white; border: none; }
-        
-        .search-container { padding: 0 25px 20px; }
-        .search-box { 
-            width: 100%; padding: 18px; border-radius: 20px; border: 2px solid #ddd; 
-            font-size: 16px; outline: none; box-sizing: border-box; background: white; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
+        @keyframes rainbow-run { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+        @keyframes bounce-jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-        .main-content { 
-            padding: 10px 25px 40px; display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 25px; 
+        /* ২. টপ বার ডিজাইন */
+        .top-bar {
+            background: var(--white); padding: 12px 20px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 2000;
+            border-bottom: 4px solid var(--blue); color: var(--dark);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .card { 
-            background: var(--white); border-radius: 35px; overflow: hidden; 
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08); text-align: center; 
-            padding-bottom: 25px; border: 1px solid #f0f0f0; transition: transform 0.3s;
+        .user-meta { display: flex; align-items: center; gap: 12px; }
+        .user-meta img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--blue); }
+        .bal-badge { background: var(--blue); color: white; padding: 6px 15px; border-radius: 50px; font-weight: 900; font-size: 14px; }
+
+        /* ৩. স্মার্ট নোটিশ (Premium Glow) */
+        #smart-toast {
+            position: fixed; top: -150px; left: 50%; transform: translateX(-50%);
+            padding: 18px 35px; border-radius: 20px; font-size: 15px; font-weight: 800; z-index: 9999;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.3);
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            min-width: 250px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .thumb-box { width: 100%; height: 200px; overflow: hidden; background: #eee; }
-        .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
+        #smart-toast.success { background: linear-gradient(135deg, rgba(0,255,136,0.9), rgba(0,173,101,0.9)); color: #000; border: 1px solid #00ff88; }
+        #smart-toast.error { background: linear-gradient(135deg, rgba(255,62,62,0.9), rgba(179,0,0,0.9)); color: #fff; border: 1px solid #ff3e3e; }
+        #smart-toast.active { top: 40px; }
+
+        /* ৪. সার্চ বক্স ডিজাইন */
+        .search-container { margin: 25px auto; width: 90%; padding: 3px; background: var(--rainbow); border-radius: 15px; animation: rainbow-run 5s linear infinite; }
+        .search-box { width: 100%; padding: 14px 15px; border-radius: 12px; border: none; outline: none; background: var(--white); color: var(--dark); font-size: 15px; font-weight: 600; box-sizing: border-box; }
+
+        /* ৫. ভিডিও কার্ড সিস্টেম */
+        .v-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 0 15px; }
+        .v-card { 
+            background: var(--rainbow); border-radius: 20px; padding: 3px;
+            animation: rainbow-run 4s linear infinite; transition: transform 0.2s;
+        }
+        .v-card-inner { background: var(--white); border-radius: 17px; overflow: hidden; height: 100%; }
+        .v-thumb { height: 110px; background: #000; overflow: hidden; }
+        .v-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .v-info { padding: 12px; text-align: center; background: #fff; }
+        .v-title { font-size: 13px; font-weight: 800; color: #333; height: 35px; overflow: hidden; margin-bottom: 8px; }
+        .v-btn { background: var(--blue); color: white; border: none; padding: 10px; width: 100%; border-radius: 12px; font-weight: 900; font-size: 11px; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
+        .locked-btn { background: #64748b !important; cursor: not-allowed; }
+
+        /* ৬. পেজ এবং ট্যাব সিস্টেম */
+        .page { display: none; padding: 25px 20px 120px; min-height: 80vh; }
+        .page.active { display: block; }
+
+        /* ৭. প্রফেশনাল কার্ড ডিজাইন */
+        .card-pro { background: var(--white); color: var(--dark); border-radius: 30px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 35px rgba(0,0,0,0.3); border: 1px solid #e2e8f0; }
+        .profile-pic-box { 
+            display: inline-block; padding: 5px; border-radius: 50%; 
+            background: var(--rainbow); animation: rainbow-run 3s linear infinite;
+            margin-bottom: 15px;
+        }
+        .profile-pic-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; display: block; }
+
+        /* উইথড্র মেথড সিলেক্টর */
+        .method-selector { display: flex; gap: 12px; margin: 15px 0; background: #f1f5f9; padding: 8px; border-radius: 18px; }
+        .method-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; text-align: center; font-size: 13px; transition: 0.3s; border: 2px solid transparent; color: #64748b; }
+        .method-btn.active { background: var(--white); color: var(--blue); border-color: var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        /* ৮. বটম নেভিগেশন */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: var(--white);
+            display: flex; justify-content: space-around; padding: 15px 0;
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.4); z-index: 1000;
+        }
+        .nav-item { text-align: center; color: #64748b; font-size: 12px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--blue); transform: translateY(-5px); font-weight: bold; }
+        .nav-item span { font-size: 26px; display: block; margin-bottom: 2px; }
         
-        .card-details { padding: 20px; }
-        .video-title { margin: 0 0 15px; font-size: 19px; color: #333; height: 50px; overflow: hidden; display: flex; align-items: center; justify-content: center; line-height: 1.4; font-weight: bold; user-select: text !important; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; font-weight: 800; color: #555; }
-        
-        .download-btn { 
-            background: linear-gradient(135deg, #00c853, #007a33); 
-            color: white; border: none; padding: 16px; width: 90%; 
-            border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 16px; 
-            box-shadow: 0 8px 20px rgba(0, 200, 83, 0.3);
+        /* ৯. উইথড্র হিস্ট্রি */
+        .history-list { margin-top: 15px; }
+        .h-item { 
+            background: #f8fafc; padding: 12px; border-radius: 15px; 
+            margin-bottom: 10px; display: flex; justify-content: space-between; 
+            align-items: center; border-left: 5px solid var(--blue);
         }
-        .locked-btn { background: #555 !important; cursor: not-allowed !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-section"><h1>Bachelor Point Season 5</h1></div>
-    <div class="category-bar">
-        <button class="cat-btn active" onclick="filterCat('All', this)">All 📁</button>
-        <button class="cat-btn" onclick="filterCat('BP S5', this)">BP S5 🎭</button>
+    <div id="smart-toast">সফল!</div>
+
+    <div class="top-bar">
+        <div class="user-meta">
+            <img id="head-img" src="">
+            <div>
+                <span id="u-name-top" style="font-weight: 800; font-size: 15px;">Loading...</span><br>
+                <small id="u-id-top" style="font-weight: 800; font-size: 11px; color: var(--blue);">ID: 000000</small>
+            </div>
+        </div>
+        <div class="bal-badge">৳ <span id="head-bal">0</span></div>
     </div>
-    <div class="search-container"><input type="number" id="videoSearch" class="search-box" placeholder="এপিসোড নাম্বার লিখে সার্চ দিন..." onkeyup="renderUI()"></div>
-    <div class="main-content" id="video-display">লোডিং হচ্ছে...</div>
+
+    <div id="p-home" class="page active">
+        <div style="text-align: center; margin-bottom: 10px; padding-top: 30px;">
+            <h1 class="jump-text" style="font-size: 32px; margin:0;">BACHELOR POINT S5</h1>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="episodeSearch" class="search-box" placeholder="লেখুনঃ 5 (Episode 5 এর জন্য)" onkeyup="filterVids()">
+        </div>
+
+        <div class="v-grid" id="v-list">লোড হচ্ছে...</div>
+    </div>
+
+    <div id="p-earn" class="page">
+        <div class="card-pro">
+            <h2 style="color: var(--blue); margin-top:0;">Daily Rewards</h2>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
+                <div><h3 style="margin:0; font-size:14px;">টাস্ক ১ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম আপডেট চ্যানেল</p></div>
+                <button id="btn-t1" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(1, 'https://t.me/bachelor_point_updates')">JOIN</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
+                <div><h3 style="margin:0; font-size:14px;">টাস্ক ২ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম চ্যানেল ২</p></div>
+                <button id="btn-t2" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(2, 'https://t.me/Becelor_Point_5')">JOIN</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
+                <div><h3 style="margin:0; font-size:14px;">টাস্ক ৩ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম চ্যানেল ৩</p></div>
+                <button id="btn-t3" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(3, 'https://t.me/Bachelor_Point_Seasonnn')">JOIN</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue);">
+                <div><h3 style="margin:0; font-size:14px;">টাস্ক ৪ (৳৫)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">হোয়াটসঅ্যাপ চ্যানেল</p></div>
+                <button id="btn-t4" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(4, 'https://www.whatsapp.com/channel/0029Vb7EdqP30LKQmhZGKg3L')">JOIN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-refer" class="page">
+        <div class="card-pro" style="text-align: center;">
+            <h2 style="color: var(--blue);">Refer & Earn</h2>
+            <p style="color: #666; font-size: 14px;">প্রতি রেফারে ১০ টাকা পাবেন। ২৫টি রেফার লাগবে।</p>
+            <div id="ref-url" style="background: #f1f5f9; padding: 15px; border-radius: 15px; border: 2px dashed var(--blue); color: var(--blue); font-size: 13px; margin: 20px 0; word-break: break-all; font-family: monospace; font-weight: bold;">...</div>
+            <button class="v-btn" style="width: 100%; padding: 16px; font-size: 15px;" onclick="copyLink()">কপি রেফার লিঙ্ক 📋</button>
+            <p style="margin-top:20px; font-weight: 900; font-size: 20px; color: var(--dark);">মোট রেফার: <span id="ref-val" style="color: var(--blue);">0</span>/25</p>
+        </div>
+    </div>
+
+    <div id="p-profile" class="page">
+        <div class="card-pro" style="text-align: center;">
+            <div class="profile-pic-box">
+                <img id="u-img" src="">
+            </div>
+            <h2 id="u-name-val" style="margin: 5px 0; color: var(--dark); font-weight: 900; font-size: 26px;">...</h2>
+            <div style="font-size: 40px; font-weight: 900; color: var(--blue);">৳ <span id="u-bal-val">0</span></div>
+            <span style="background: #f1f5f9; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; color: var(--blue);">UID: <span id="u-id-val">000000</span></span>
+        </div>
+
+        <div class="card-pro">
+            <h3 style="margin:0; color: var(--blue); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Withdrawal</h3>
+            <div class="method-selector">
+                <div class="method-btn active" id="btn-bkash" onclick="setMethod('Bkash')">Bkash</div>
+                <div class="method-btn" id="btn-nagad" onclick="setMethod('Nagad')">Nagad</div>
+            </div>
+            <input type="number" id="w-num" class="search-box" style="margin-top:5px; border:1px solid #ddd;" placeholder="বিকাশ নাম্বার দিন">
+            <input type="number" id="w-amt" class="search-box" style="margin-top:15px; border:1px solid #ddd;" placeholder="পরিমাণ (মিনিমাম ২৫০)">
+            <button class="v-btn" style="width: 100%; padding: 16px; margin-top: 20px; font-size: 15px;" onclick="doWithdraw()">Withdraw Now</button>
+        </div>
+
+        <div class="card-pro">
+            <h3 style="margin:0; color: var(--blue); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">History</h3>
+            <div id="h-list-ui" class="history-list">
+                <p style="text-align: center; color: #999; font-size: 12px;">কোনো হিস্ট্রি নেই</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="nav('p-home', this)"><span>🏠</span>Home</div>
+        <div class="nav-item" onclick="nav('p-earn', this)"><span>💰</span>Earn</div>
+        <div class="nav-item" onclick="nav('p-refer', this)"><span>🔗</span>Refer</div>
+        <div class="nav-item" onclick="nav('p-profile', this)"><span>👤</span>Profile</div>
+    </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = { databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const BOT_NAME = "Bachelor_Point_Season_5_ep_bot"; 
+        const LOCK_TIME = 24 * 60 * 60 * 1000;
+        const AD_LIMIT = 4;
+        let selectedMethod = "Bkash";
+
+        const db = firebase.initializeApp({ databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com/" }).database();
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const BOT_USERNAME = "Bachelor_Point_Season_5_ep_bot"; 
-        const AD_LIMIT = 5; 
-        const RESET_TIME = 24 * 60 * 60 * 1000;
-        const LOCK_TIME = 24 * 60 * 60 * 1000;
+        let user = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {
+            bal: 0, t1: false, t2: false, t3: false, t4: false, refs: 0, 
+            id: tg.initDataUnsafe.user?.id || "68493021",
+            name: (tg.initDataUnsafe.user?.first_name || "M R DEVELOPER"),
+            photo: tg.initDataUnsafe.user?.photo_url || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+        };
 
-        let allVideos = {};
-        let currentCategory = "All";
-
-        // Fetching Data from Firebase
-        db.ref('videos').on('value', (snap) => { 
-            allVideos = snap.val() || {}; 
-            renderUI(); 
-        });
-
-        function filterCat(cat, btn) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderUI();
+        function setMethod(m) {
+            selectedMethod = m;
+            document.getElementById('btn-bkash').classList.toggle('active', m === 'Bkash');
+            document.getElementById('btn-nagad').classList.toggle('active', m === 'Nagad');
+            document.getElementById('w-num').placeholder = m === 'Bkash' ? "বিকাশ নাম্বার দিন" : "নগদ নাম্বার দিন";
         }
 
-        function getEpNum(name) {
-            const match = name.match(/(?:episode|ep|এপিসোড)\s*(\d+)/i);
-            return match ? parseInt(match[1]) : 0;
+        function syncUI() {
+            document.getElementById('u-name-top').innerText = user.name;
+            document.getElementById('u-name-val').innerText = user.name;
+            document.getElementById('u-id-top').innerText = "ID: " + user.id;
+            document.getElementById('u-id-val').innerText = user.id;
+            document.getElementById('head-bal').innerText = user.bal;
+            document.getElementById('u-bal-val').innerText = user.bal;
+            document.getElementById('ref-val').innerText = user.refs;
+            document.getElementById('head-img').src = user.photo;
+            document.getElementById('u-img').src = user.photo;
+            document.getElementById('ref-url').innerText = `https://t.me/${BOT_NAME}?start=${user.id}`;
+            [1,2,3,4].forEach(n => { 
+                const b = document.getElementById('btn-t'+n);
+                if(user['t'+n]) { b.innerText = "DONE"; b.style.background = "#16a34a"; b.onclick = null; }
+            });
+            localStorage.setItem('mr_v_ultimate_pro', JSON.stringify(user));
+            db.ref('users/' + user.id).update(user);
         }
 
-        function renderUI() {
-            const container = document.getElementById('video-display');
-            const searchInput = document.getElementById('videoSearch').value.trim();
+        function joinTask(num, url) {
+            window.open(url, "_blank");
+            const btn = document.getElementById('btn-t'+num);
+            btn.innerText = "REFRESH";
+            btn.style.background = "#f59e0b";
+            btn.onclick = () => claimTask(num);
+        }
+
+        function claimTask(num) {
+            const rewards = { 1: 10, 2: 10, 3: 10, 4: 5 };
+            user.bal += rewards[num];
+            user['t'+num] = true;
+            syncUI();
+            toast(`৳${rewards[num]} বোনাস যুক্ত হয়েছে!`);
+        }
+
+        function nav(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function toast(msg, type = 'success') {
+            const t = document.getElementById('smart-toast');
+            const icon = type === 'success' ? '✅' : '❌';
+            t.innerHTML = `<span>${icon}</span> <span>${msg}</span>`; 
+            t.className = type; t.classList.add('active');
+            setTimeout(() => t.classList.remove('active'), 1500); 
+        }
+
+        function copyLink() {
+            const l = document.getElementById('ref-url').innerText;
+            const i = document.createElement('input'); i.value = l; document.body.appendChild(i); i.select();
+            document.execCommand('copy'); document.body.removeChild(i);
+            toast("রেফার লিঙ্ক কপি হয়েছে!");
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const refBy = urlParams.get('start');
+        if (refBy && refBy != user.id && !localStorage.getItem('ref_done')) {
+            db.ref('users/' + refBy).once('value', snap => {
+                if(snap.exists()){
+                    let refData = snap.val();
+                    refData.bal += 10;
+                    refData.refs += 1;
+                    db.ref('users/' + refBy).update(refData);
+                    localStorage.setItem('ref_done', 'true');
+                }
+            });
+        }
+
+        let allVids = {};
+        db.ref('videos').on('value', snap => { allVids = snap.val() || {}; renderVids(); });
+
+        function renderVids(query = "") {
+            const container = document.getElementById('v-list');
             container.innerHTML = "";
-
-            let videoList = [];
-            for (let id in allVideos) {
-                videoList.push({ ...allVideos[id], id: id });
-            }
-
-            videoList.sort((a, b) => getEpNum(b.name) - getEpNum(a.name));
-
-            videoList.forEach((v) => {
-                if (currentCategory !== "All" && v.category !== currentCategory) return;
-                if (searchInput !== "" && getEpNum(v.name).toString() !== searchInput) return;
-
-                const id = v.id;
-                const lastTakeTime = localStorage.getItem('lock_' + id);
-                const isLocked = lastTakeTime && (Date.now() - lastTakeTime < LOCK_TIME);
-                
-                let btnTxt = isLocked ? "🚫 ইনবক্স চেক করুন" : "📥 GET DOWNLOAD VIDEO";
-                let btnClass = isLocked ? "download-btn locked-btn" : "download-btn";
-
-                container.innerHTML += `
-                    <div class="card">
-                        <div class="thumb-box"><img src="${v.photo}"></div>
-                        <div class="card-details">
-                            <h3 class="video-title">${v.name}</h3>
-                            <div class="info-row"><span>Status: ${isLocked ? 'Locked 🔒' : 'Online 🟢'}</span><span>${v.category}</span></div>
-                            <button class="${btnClass}" onclick="startDownloadProcess('${id}')">${btnTxt}</button>
-                        </div>
-                    </div>`;
+            let keys = Object.keys(allVids);
+            keys.sort((a, b) => { const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0; const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0; return nB - nA; });
+            keys.forEach(id => {
+                const v = allVids[id];
+                const match = v.name.match(/Episode\s+(\d+)/i);
+                const epNumber = match ? match[1] : "";
+                if (query !== "" && epNumber !== query) return;
+                const lock = localStorage.getItem('lock_' + id);
+                const isL = lock && (Date.now() - lock < LOCK_TIME);
+                container.innerHTML += `<div class="v-card"><div class="v-card-inner">
+                    <div class="v-thumb"><img src="${v.photo}"></div>
+                    <div class="v-info">
+                        <div class="v-title">${v.name}</div>
+                        <button class="v-btn ${isL ? 'locked-btn' : ''}" onclick="startProcess('${id}')">${isL ? 'Locked 🚫' : 'ভিডিও নিন'}</button>
+                    </div></div></div>`;
             });
         }
 
-        function startDownloadProcess(v_id) {
-            // Check if this specific video is already locked
-            const lastTakeTime = localStorage.getItem('lock_' + v_id);
-            const isLocked = lastTakeTime && (Date.now() - lastTakeTime < LOCK_TIME);
-
-            if (isLocked) {
-                Swal.fire({ 
-                    title: 'ইতিমধ্যে নিয়েছেন!', 
-                    text: 'আপনি ২৪ ঘন্টায় একবার এই ভিডিওটি ডাউনলোড করতে পারবেন। আপনার টেলিগ্রাম ইনবক্স চেক করুন ভিডিওটি সেখানে আছে।', 
-                    icon: 'warning',
-                    confirmButtonColor: '#e63946'
-                });
-                return;
-            }
-
-            let adData = JSON.parse(localStorage.getItem('user_ad_data')) || { count: 0, lastReset: Date.now() };
-
-            // Reset ad count after 24 hours
-            if (Date.now() - adData.lastReset > RESET_TIME) {
-                adData.count = 0;
-                adData.lastReset = Date.now();
-            }
-
-            if (adData.count < AD_LIMIT) {
-                // Show Monetag Ad for the first 5 videos
-                if (typeof show_10525370 === 'function') {
-                    show_10525370().then(() => {
-                        handleFinalStep(v_id, adData, true);
-                    }).catch(() => {
-                        // Fallback in case ad fails
-                        handleFinalStep(v_id, adData, true);
-                    });
-                } else {
-                    handleFinalStep(v_id, adData, true);
-                }
-            } else {
-                // For videos after the 5th ad, just show success and lock
-                handleFinalStep(v_id, adData, false);
-            }
-        }
-
-        function handleFinalStep(v_id, adData, incrementAd) {
-            // Notice with the "ভিডিওটি নিন" button
-            Swal.fire({
-                title: 'সফল!',
-                text: 'নিচের বাটনে ক্লিক করে ভিডিওটি আপনার ইনবক্সে নিয়ে নিন। এটি পরবর্তী ২৪ ঘণ্টার জন্য লক হয়ে যাবে।',
-                icon: 'success',
-                confirmButtonText: 'ভিডিওটি নিন',
-                confirmButtonColor: '#00c853',
-                allowOutsideClick: false
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    if (incrementAd) {
-                        adData.count++;
-                    }
-                    // Save ad data and individual video lock
-                    localStorage.setItem('user_ad_data', JSON.stringify(adData));
-                    localStorage.setItem('lock_' + v_id, Date.now());
-                    
-                    renderUI(); // Refresh UI to show locked status
-                    
-                    // Redirect to Telegram Bot
-                    window.location.href = `https://t.me/${BOT_USERNAME}?start=${v_id}`;
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+        function startProcess(id) {
+            const lock = localStorage.getItem('lock_' + id);
+            if (lock && (Date.now() - lock < LOCK_TIME)) return toast("ভিডিওটি লক আছে!", "error");
+            let adData = JSON.parse(localStorage.getItem('ad_p_final')) || { c: 0, d: new Date().toLocaleDateString() };
+            if (adData.d !== new Date().toLocaleDateString()) { adData.c = 0; adData.d = new Date().toLocaleDateString(); }
+            if (adData.c < AD_LIMIT) {
+                if (typeof show_10525370 === 'function') { show_10525370
