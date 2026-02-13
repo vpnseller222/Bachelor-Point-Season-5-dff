@@ -26,7 +26,6 @@
             width: 100vw; height: 100vh; overflow-x: hidden;
         }
 
-        /* ১. চকচকে লাফালাফি করা রেইনবো এনিমেশন */
         .jump-text {
             background: var(--rainbow);
             background-size: 300% 300%;
@@ -39,7 +38,6 @@
         @keyframes rainbow-run { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
         @keyframes bounce-jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-        /* ২. টপ বার ডিজাইন */
         .top-bar {
             background: var(--white); padding: 12px 20px; display: flex; align-items: center;
             justify-content: space-between; position: sticky; top: 0; z-index: 2000;
@@ -50,7 +48,6 @@
         .user-meta img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--blue); object-fit: cover; }
         .bal-badge { background: var(--blue); color: white; padding: 6px 15px; border-radius: 50px; font-weight: 900; font-size: 14px; }
 
-        /* ৩. স্মার্ট নোটিশ (Premium Glow) */
         #smart-toast {
             position: fixed; top: -150px; left: 50%; transform: translateX(-50%);
             padding: 18px 35px; border-radius: 20px; font-size: 15px; font-weight: 800; z-index: 9999;
@@ -63,11 +60,9 @@
         #smart-toast.error { background: linear-gradient(135deg, rgba(255,62,62,0.9), rgba(179,0,0,0.9)); color: #fff; border: 1px solid #ff3e3e; }
         #smart-toast.active { top: 40px; }
 
-        /* ৪. সার্চ বক্স ডিজাইন */
         .search-container { margin: 25px auto; width: 90%; padding: 3px; background: var(--rainbow); border-radius: 15px; animation: rainbow-run 5s linear infinite; }
         .search-box { width: 100%; padding: 14px 15px; border-radius: 12px; border: none; outline: none; background: var(--white); color: var(--dark); font-size: 15px; font-weight: 600; box-sizing: border-box; }
 
-        /* ৫. ভিডিও কার্ড সিস্টেম */
         .v-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; padding: 0 15px; }
         .v-card { 
             background: var(--rainbow); border-radius: 20px; padding: 3px;
@@ -81,11 +76,9 @@
         .v-btn { background: var(--blue); color: white; border: none; padding: 10px; width: 100%; border-radius: 12px; font-weight: 900; font-size: 11px; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
         .locked-btn { background: #64748b !important; cursor: not-allowed; }
 
-        /* ৬. পেজ এবং ট্যাব সিস্টেম */
         .page { display: none; padding: 25px 20px 120px; min-height: 80vh; }
         .page.active { display: block; }
 
-        /* ৭. প্রফেশনাল কার্ড ডিজাইন */
         .card-pro { background: var(--white); color: var(--dark); border-radius: 30px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 35px rgba(0,0,0,0.3); border: 1px solid #e2e8f0; }
         .profile-pic-box { 
             display: inline-block; padding: 5px; border-radius: 50%; 
@@ -94,12 +87,10 @@
         }
         .profile-pic-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; display: block; object-fit: cover; }
 
-        /* উইথড্র মেথড সিলেক্টর */
         .method-selector { display: flex; gap: 12px; margin: 15px 0; background: #f1f5f9; padding: 8px; border-radius: 18px; }
         .method-btn { flex: 1; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; text-align: center; font-size: 13px; transition: 0.3s; border: 2px solid transparent; color: #64748b; }
         .method-btn.active { background: var(--white); color: var(--blue); border-color: var(--blue); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-        /* ৮. বটম নেভিগেশন */
         .bottom-nav {
             position: fixed; bottom: 0; width: 100%; background: var(--white);
             display: flex; justify-content: space-around; padding: 15px 0;
@@ -109,7 +100,6 @@
         .nav-item.active { color: var(--blue); transform: translateY(-5px); font-weight: bold; }
         .nav-item span { font-size: 26px; display: block; margin-bottom: 2px; }
         
-        /* ৯. উইথড্র হিস্ট্রি */
         .history-list { margin-top: 15px; }
         .h-item { 
             background: #f8fafc; padding: 12px; border-radius: 15px; 
@@ -216,26 +206,37 @@
         const LOCK_TIME = 24 * 60 * 60 * 1000;
         let selectedMethod = "Bkash";
 
-        // Firebase Setup - Added .firebaseio.com/ correctly
-        const db = firebase.initializeApp({ 
-            databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com" 
-        }).database();
-
+        // Firebase Initialization with Full Config
+        const firebaseConfig = {
+            databaseURL: "https://bachelor-point-season-5-default-rtdb.firebaseio.com"
+        };
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch(e) {
+            console.log("Firebase already init");
+        }
+        
+        const db = firebase.database();
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
 
-        // ইউজার ডাটা হ্যান্ডলিং (সঠিকভাবে টেলিগ্রাম থেকে ডাটা নেওয়ার জন্য)
+        // টেলিগ্রাম ডাটা আসার জন্য অপেক্ষা এবং হ্যান্ডলিং
         function initUser() {
-            let tgUser = tg.initDataUnsafe?.user;
-            let defaultPhoto = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+            tg.ready();
+            tg.expand();
             
+            let tgUser = tg.initDataUnsafe?.user || {};
             let localData = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {};
             
-            let userObj = {
-                id: tgUser?.id || localData.id || "12345678",
-                name: tgUser?.first_name || localData.name || "Unknown User",
-                photo: tgUser?.photo_url || localData.photo || defaultPhoto,
+            // যদি টেলিগ্রাম আইডি না থাকে তবে লোকাল ডাটা বা ডিফল্ট
+            let userId = tgUser.id || localData.id || "100" + Math.floor(Math.random() * 9000);
+            let userName = tgUser.first_name || localData.name || "User";
+            let userPhoto = tgUser.photo_url || localData.photo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+            return {
+                id: userId,
+                name: userName,
+                photo: userPhoto,
                 bal: localData.bal || 0,
                 refs: localData.refs || 0,
                 t1: localData.t1 || false,
@@ -243,7 +244,6 @@
                 t3: localData.t3 || false,
                 t4: localData.t4 || false
             };
-            return userObj;
         }
 
         let user = initUser();
@@ -268,30 +268,36 @@
                     b.onclick = null; 
                 }
             });
+            
             localStorage.setItem('mr_v_ultimate_pro', JSON.stringify(user));
+            // ডাটাবেসে ইউজার তথ্য সিঙ্ক
             db.ref('users/' + user.id).update(user);
         }
 
-        // ভিডিও ডাটা রেন্ডারিং ফিক্স
+        // ভিডিও ডাটাবেস লোড সিস্টেম (সঠিকভাবে)
         let allVids = {};
-        db.ref('videos').on('value', snap => { 
-            allVids = snap.val() || {}; 
-            renderVids(); 
-        }, (error) => {
-            console.error("Firebase Error: ", error);
-            document.getElementById('v-list').innerHTML = "ডাটা লোড হতে সমস্যা হচ্ছে!";
+        db.ref('videos').on('value', (snap) => {
+            allVids = snap.val() || {};
+            renderVids();
+        }, (err) => {
+            document.getElementById('v-list').innerHTML = "Firebase Error: Permission Denied";
         });
 
         function renderVids(query = "") {
             const container = document.getElementById('v-list');
             container.innerHTML = "";
             let keys = Object.keys(allVids);
-            if(keys.length === 0) { container.innerHTML = "কোন ভিডিও নেই"; return; }
             
-            keys.sort((a, b) => { 
-                const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0; 
-                const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0; 
-                return nB - nA; 
+            if(keys.length === 0) {
+                container.innerHTML = "<p style='grid-column: 1/-1; text-align: center;'>কোন ভিডিও পাওয়া যায়নি। ডাটাবেস চেক করুন।</p>";
+                return;
+            }
+
+            // ভিডিও শর্টিং
+            keys.sort((a, b) => {
+                const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0;
+                const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0;
+                return nB - nA;
             });
 
             keys.forEach(id => {
@@ -304,7 +310,7 @@
                 container.innerHTML += `
                 <div class="v-card">
                     <div class="v-card-inner">
-                        <div class="v-thumb"><img src="${v.photo}"></div>
+                        <div class="v-thumb"><img src="${v.photo || 'https://via.placeholder.com/150'}"></div>
                         <div class="v-info">
                             <div class="v-title">${v.name}</div>
                             <button class="v-btn ${isL ? 'locked-btn' : ''}" onclick="startProcess('${id}')">
@@ -321,7 +327,29 @@
             renderVids(q);
         }
 
-        // অন্যান্য ফাংশন আগের মতই
+        function startProcess(id) {
+            const v = allVids[id];
+            if(!v) return;
+            const lock = localStorage.getItem('lock_' + id);
+            if(lock && (Date.now() - lock < LOCK_TIME)) {
+                return toast("এটি ২৪ ঘন্টার জন্য লক করা আছে!", "error");
+            }
+
+            // অ্যাড দেখানোর আগে চেক
+            if(typeof show_10525370 === 'function') {
+                show_10525370().then(() => {
+                    localStorage.setItem('lock_' + id, Date.now());
+                    window.open(v.link, "_blank");
+                    renderVids();
+                }).catch(() => {
+                    // যদি অ্যাড না আসে তবুও ভিডিও দিবে
+                    window.open(v.link, "_blank");
+                });
+            } else {
+                window.open(v.link, "_blank");
+            }
+        }
+
         function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -333,24 +361,4 @@
             selectedMethod = m;
             document.getElementById('btn-bkash').classList.toggle('active', m === 'Bkash');
             document.getElementById('btn-nagad').classList.toggle('active', m === 'Nagad');
-            document.getElementById('w-num').placeholder = m === 'Bkash' ? "বিকাশ নাম্বার দিন" : "নগদ নাম্বার দিন";
-        }
-
-        function toast(msg, type = 'success') {
-            const t = document.getElementById('smart-toast');
-            t.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span> <span>${msg}</span>`; 
-            t.className = type; t.classList.add('active');
-            setTimeout(() => t.classList.remove('active'), 2500); 
-        }
-
-        function copyLink() {
-            const l = document.getElementById('ref-url').innerText;
-            const i = document.createElement('input'); 
-            i.value = l; document.body.appendChild(i); i.select();
-            document.execCommand('copy'); document.body.removeChild(i);
-            toast("রেফার লিঙ্ক কপি হয়েছে!");
-        }
-
-        function joinTask(num, url) {
-            window.open(url, "_blank");
-            const btn = document.getElementBy
+            document.get
