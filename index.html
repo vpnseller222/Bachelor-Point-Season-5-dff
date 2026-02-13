@@ -47,7 +47,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .user-meta { display: flex; align-items: center; gap: 12px; }
-        .user-meta img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--blue); }
+        .user-meta img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--blue); object-fit: cover; }
         .bal-badge { background: var(--blue); color: white; padding: 6px 15px; border-radius: 50px; font-weight: 900; font-size: 14px; }
 
         /* ৩. স্মার্ট নোটিশ (Premium Glow) */
@@ -92,7 +92,7 @@
             background: var(--rainbow); animation: rainbow-run 3s linear infinite;
             margin-bottom: 15px;
         }
-        .profile-pic-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; display: block; }
+        .profile-pic-box img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; display: block; object-fit: cover; }
 
         /* উইথড্র মেথড সিলেক্টর */
         .method-selector { display: flex; gap: 12px; margin: 15px 0; background: #f1f5f9; padding: 8px; border-radius: 18px; }
@@ -126,7 +126,7 @@
         <div class="user-meta">
             <img id="head-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
             <div>
-                <span id="u-name-top" style="font-weight: 800; font-size: 15px;">Loading...</span><br>
+                <span id="u-name-top" style="font-weight: 800; font-size: 15px;">User</span><br>
                 <small id="u-id-top" style="font-weight: 800; font-size: 11px; color: var(--blue);">ID: 000000</small>
             </div>
         </div>
@@ -148,22 +148,18 @@
     <div id="p-earn" class="page">
         <div class="card-pro">
             <h2 style="color: var(--blue); margin-top:0;">Daily Rewards</h2>
-            
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
                 <div><h3 style="margin:0; font-size:14px;">টাস্ক ১ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম আপডেট চ্যানেল</p></div>
                 <button id="btn-t1" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(1, 'https://t.me/bachelor_point_updates')">JOIN</button>
             </div>
-
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
                 <div><h3 style="margin:0; font-size:14px;">টাস্ক ২ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম চ্যানেল ২</p></div>
                 <button id="btn-t2" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(2, 'https://t.me/Becelor_Point_5')">JOIN</button>
             </div>
-
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue); margin-bottom: 15px;">
                 <div><h3 style="margin:0; font-size:14px;">টাস্ক ৩ (৳১০)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">টেলিগ্রাম চ্যানেল ৩</p></div>
                 <button id="btn-t3" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(3, 'https://t.me/Bachelor_Point_Seasonnn')">JOIN</button>
             </div>
-
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid var(--blue);">
                 <div><h3 style="margin:0; font-size:14px;">টাস্ক ৪ (৳৫)</h3><p style="margin:2px 0 0; font-size:11px; color:#666;">হোয়াটসঅ্যাপ চ্যানেল</p></div>
                 <button id="btn-t4" class="v-btn" style="width: auto; padding: 8px 15px;" onclick="joinTask(4, 'https://www.whatsapp.com/channel/0029Vb7EdqP30LKQmhZGKg3L')">JOIN</button>
@@ -186,11 +182,10 @@
             <div class="profile-pic-box">
                 <img id="u-img" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
             </div>
-            <h2 id="u-name-val" style="margin: 5px 0; color: var(--dark); font-weight: 900; font-size: 26px;">...</h2>
+            <h2 id="u-name-val" style="margin: 5px 0; color: var(--dark); font-weight: 900; font-size: 26px;">User</h2>
             <div style="font-size: 40px; font-weight: 900; color: var(--blue);">৳ <span id="u-bal-val">0</span></div>
             <span style="background: #f1f5f9; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; color: var(--blue);">UID: <span id="u-id-val">000000</span></span>
         </div>
-
         <div class="card-pro">
             <h3 style="margin:0; color: var(--blue); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">Withdrawal</h3>
             <div class="method-selector">
@@ -201,7 +196,6 @@
             <input type="number" id="w-amt" class="search-box" style="margin-top:15px; border:1px solid #ddd;" placeholder="পরিমাণ (মিনিমাম ২৫০)">
             <button class="v-btn" style="width: 100%; padding: 16px; margin-top: 20px; font-size: 15px;" onclick="doWithdraw()">Withdraw Now</button>
         </div>
-
         <div class="card-pro">
             <h3 style="margin:0; color: var(--blue); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">History</h3>
             <div id="h-list-ui" class="history-list">
@@ -211,10 +205,10 @@
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="nav('p-home', this)"><span>🏠</span>Home</div>
-        <div class="nav-item" onclick="nav('p-earn', this)"><span>💰</span>Earn</div>
-        <div class="nav-item" onclick="nav('p-refer', this)"><span>🔗</span>Refer</div>
-        <div class="nav-item" onclick="nav('p-profile', this)"><span>👤</span>Profile</div>
+        <div id="nav-home" class="nav-item active" onclick="nav('p-home', this)"><span>🏠</span>Home</div>
+        <div id="nav-earn" class="nav-item" onclick="nav('p-earn', this)"><span>💰</span>Earn</div>
+        <div id="nav-refer" class="nav-item" onclick="nav('p-refer', this)"><span>🔗</span>Refer</div>
+        <div id="nav-profile" class="nav-item" onclick="nav('p-profile', this)"><span>👤</span>Profile</div>
     </div>
 
     <script>
@@ -229,13 +223,18 @@
         tg.expand();
 
         // ইউজার ডাটা হ্যান্ডলিং
-        let tgUser = tg.initDataUnsafe?.user || { id: "000000", first_name: "User", photo_url: "" };
-        let user = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {
-            bal: 0, t1: false, t2: false, t3: false, t4: false, refs: 0, 
-            id: tgUser.id,
-            name: tgUser.first_name,
-            photo: tgUser.photo_url || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-        };
+        function initUser() {
+            let userObj = tg.initDataUnsafe?.user || { id: "123456", first_name: "MR User", photo_url: "" };
+            let savedUser = JSON.parse(localStorage.getItem('mr_v_ultimate_pro')) || {
+                bal: 0, t1: false, t2: false, t3: false, t4: false, refs: 0, 
+                id: userObj.id,
+                name: userObj.first_name,
+                photo: userObj.photo_url || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            };
+            return savedUser;
+        }
+
+        let user = initUser();
 
         function setMethod(m) {
             selectedMethod = m;
@@ -322,6 +321,7 @@
             const container = document.getElementById('v-list');
             container.innerHTML = "";
             let keys = Object.keys(allVids);
+            if(keys.length === 0) { container.innerHTML = "কোন ভিডিও নেই"; return; }
             keys.sort((a, b) => { const nA = parseInt(allVids[a].name.replace(/\D/g, "")) || 0; const nB = parseInt(allVids[b].name.replace(/\D/g, "")) || 0; return nB - nA; });
             keys.forEach(id => {
                 const v = allVids[id];
@@ -340,7 +340,4 @@
         }
 
         function startProcess(id) {
-            const lock = localStorage.getItem('lock_' + id);
-            if (lock && (Date.now() - lock < LOCK_TIME)) return toast("ভিডিওটি লক আছে!", "error");
-            let adData = JSON.parse(localStorage.getItem('ad_p_final')) || { c: 0, d: new Date().toLocaleDateString() };
-            if (adData.d !== new Date().toLocaleDateStrin
+            const lock = localStorag
